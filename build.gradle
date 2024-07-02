@@ -1,0 +1,29 @@
+plugins {
+	id 'java'
+	id 'eclipse'
+}
+
+targetCompatibility = 8;
+sourceCompatibility = 8;
+
+repositories {
+	mavenCentral()
+}
+
+jar {
+
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+	manifest {
+		attributes "Main-Class": "uk.betacraft.jaranalyzer.JarAnalyzer"
+	}
+
+	from {
+		configurations.runtimeClasspath.collect {
+			it.isDirectory() ? it : zipTree(it)
+		}
+	}
+}
+
+dependencies {
+}

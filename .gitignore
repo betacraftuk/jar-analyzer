@@ -1,0 +1,12 @@
+# IDE
+/bin/
+.settings
+.project
+.classpath
+
+# Gradle
+.gradle
+build
+
+# macOS
+.DS_Store
