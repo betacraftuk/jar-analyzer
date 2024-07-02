@@ -15,7 +15,7 @@ import java.util.zip.ZipException;
 
 public class JarAnalyzer {
     // assuming UTC by default
-    private static final String tzID = System.getProperty("timezone", "UTC");
+    private static final String tzID = System.getProperty("tz", "UTC");
     private static TimeZone tz = TimeZone.getTimeZone(tzID);
 
     public static void main(String[] args) {
