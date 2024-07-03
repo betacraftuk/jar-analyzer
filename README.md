@@ -11,7 +11,7 @@ java -Dtz=<tz of jar contents> -jar jar-analyzer.jar "/path/to/dir/or/jar/to/ana
 
 For best results, use the `TZ identifier` string from [tz database](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List)
 
-Common timezones Minecraft versions have been built in so far:
+#### Common timezones Minecraft versions have been built in so far:
 - `Europe/Stockholm`:
 	- `pc-13-2011` to `1.2.4`
 	- `1.5.2-pre-25-0703`
