@@ -7,6 +7,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.TimeZone;
 import java.util.jar.JarEntry;
@@ -16,6 +17,7 @@ import java.util.zip.ZipException;
 public class JarAnalyzer {
     // assuming UTC by default
     private static final String tzID = System.getProperty("tz", "UTC");
+    private static final boolean printSubdirsDistinctly = Boolean.parseBoolean(System.getProperty("subdirs", "false"));
     private static TimeZone tz = TimeZone.getTimeZone(tzID);
 
     public static void main(String[] args) {
@@ -31,27 +33,32 @@ public class JarAnalyzer {
         }
     }
 
-    public static boolean isJarZip(File f) {
-        return !f.isDirectory() && (f.getName().toLowerCase().endsWith(".jar") || f.getName().toLowerCase().endsWith(".zip"));
+    public static boolean isZipArchive(File f) {
+        String fname = f.getName().toLowerCase();
+
+        // accept jar, zip, and additionally exe (servers before 1.9 have EXE counterparts)
+        return !f.isDirectory() && (fname.endsWith(".jar") || fname.endsWith(".zip") || fname.endsWith(".exe"));
     }
 
+    public static long depth = -1;
+
     public static void analyze(File folder) {
-        if (isJarZip(folder)) {
+        if (isZipArchive(folder)) {
             printInfoJar(folder);
         } else if (folder.isDirectory()) {
-            System.out.println(" ========= FOLDER: " + folder.getName());
+
+            if (printSubdirsDistinctly)
+                System.out.println(" ========= FOLDER: " + folder.getName());
 
             File[] files = folder.listFiles();
 
-            for (File file : files) {
-                if (file.isDirectory()) {
-                    analyze(file);
-                } else {
-                    printInfoJar(file);
-                }
-            }
+            Arrays.sort(files, new FilenameComparator());
 
-            System.out.println(" ========= END: " + folder.getName());
+            for (File file : files)
+                analyze(file);
+
+            if (printSubdirsDistinctly)
+                System.out.println(" ========= END: " + folder.getName());
         }
     }
 
@@ -93,7 +100,7 @@ public class JarAnalyzer {
             System.out.printf("%-60.60s  %-60.60s%n", relativePath, formattedDateTime);
 
         } catch (ZipException zipException) {
-            // happens on 1.9+ jars - avoid it as there's nothing that can be done
+            // disregard non-ZIP or corrupted files
             if ("zip END header not found".equals(zipException.getMessage()))
                 return;
 
